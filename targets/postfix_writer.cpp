@@ -1,4 +1,4 @@
-// $Id: postfix_writer.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
+// $Id: postfix_writer.cpp,v 1.3 2014/05/04 23:44:15 david Exp $ -*- c++ -*-
 #include <string>
 #include <sstream>
 #include "targets/type_checker.h"
@@ -233,6 +233,8 @@ void simple::postfix_writer::do_while_node(simple::while_node * const node, int 
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  CHECK_NODE(node);
+
   // DAVID: horrible hack!
   // (this is caused by Simple not having explicit variable declarations)
   const std::string &id = node->lvalue()->value();
@@ -245,8 +247,6 @@ void simple::postfix_writer::do_assignment_node(simple::assignment_node * const 
     _pf.TEXT(); // return to the TEXT segment
     symbol->value(0);
   }
-
-  CHECK_NODE(node);
 
   node->rvalue()->accept(this, lvl); // determine the new value
   _pf.DUP();

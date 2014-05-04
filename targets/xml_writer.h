@@ -1,11 +1,13 @@
-// $Id: xml_writer.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: xml_writer.h,v 1.2 2014/05/04 23:44:15 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_XMLWRITER_H__
 #define __SIMPLE_SEMANTICS_XMLWRITER_H__
 
 #include <string>
 #include <iostream>
 #include <cdk/ast/basic_node.h>
+#include <cdk/symbol_table.h>
 #include "targets/basic_ast_visitor.h"
+#include "targets/symbol.h"
 
 namespace simple {
 
@@ -13,10 +15,11 @@ namespace simple {
    * Print nodes as XML elements to the output stream.
    */
   class xml_writer: public basic_ast_visitor {
+    cdk::symbol_table<simple::symbol> &_symtab;
 
   public:
-    xml_writer(std::shared_ptr<cdk::compiler> compiler) :
-        basic_ast_visitor(compiler) {
+    xml_writer(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<simple::symbol> &symtab) :
+        basic_ast_visitor(compiler), _symtab(symtab) {
     }
 
   public:

@@ -1,7 +1,24 @@
-// $Id: c_writer.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
+// $Id: c_writer.cpp,v 1.3 2014/05/04 23:44:15 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/c_writer.h"
+#include "targets/type_checker.h"
 #include "ast/all.h"  /* automatically generated */
+
+//---------------------------------------------------------------------------
+//     HELPER MACRO FOR TYPE CHECKING
+//---------------------------------------------------------------------------
+
+#define CHECK_NODE(node) \
+{ \
+  try { \
+    simple::type_checker checker(_compiler, _symtab); \
+    (node)->accept(&checker, 0); \
+  } \
+  catch (std::string &problem) { \
+    std::cerr << (node)->lineno() << ": FATAL: " << problem << std::endl; \
+    return; \
+  } \
+}
 
 //---------------------------------------------------------------------------
 
@@ -21,12 +38,13 @@ void simple::c_writer::do_double_node(cdk::double_node * const node, int lvl) {
 }
 
 void simple::c_writer::do_string_node(cdk::string_node * const node, int lvl) {
-  os() << std::string(lvl + 2, ' ') << "printf(\"%s\\n\", \"" << node->value() << "\");\n";
+  os() << "\"" << node->value() << "\"";
 }
 
 //---------------------------------------------------------------------------
 
 void simple::c_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
+  CHECK_NODE(node);
   os() << " - ";
   node->argument()->accept(this, lvl);
 }
@@ -34,6 +52,7 @@ void simple::c_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 inline void simple::c_writer::do_binary_expression_node(cdk::binary_expression_node * const node, int lvl, const char *op) {
+  CHECK_NODE(node);
   node->left()->accept(this, lvl);
   os() << " " << op << " ";
   node->right()->accept(this, lvl);
@@ -76,17 +95,21 @@ void simple::c_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void simple::c_writer::do_rvalue_node(simple::rvalue_node * const node, int lvl) {
+  CHECK_NODE(node);
   node->lvalue()->accept(this, lvl);
 }
 
 //---------------------------------------------------------------------------
 
 void simple::c_writer::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
+  CHECK_NODE(node);
   const std::string &id = node->value();
   if (_symtab.find(id))
     os() << id;
-  else
-    throw 42; // life, the universe, and everything
+  else {
+    std::cerr << "CANNOT HAPPEN!" << std::endl;
+    exit(1);
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -107,13 +130,22 @@ void simple::c_writer::do_program_node(simple::program_node * const node, int lv
 }
 
 void simple::c_writer::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
+  CHECK_NODE(node);
   os() << std::string(lvl + 2, ' ');
   node->argument()->accept(this, lvl);
   os() << ";\n";
 }
 
 void simple::c_writer::do_print_node(simple::print_node * const node, int lvl) {
-  os() << std::string(lvl + 2, ' ') << "printf(\"%d\\n\", ";
+  CHECK_NODE(node);
+  if (node->argument()->type()->name() == basic_type::TYPE_INT)
+    os() << std::string(lvl + 2, ' ') << "printf(\"%d\\n\", ";
+  else if (node->argument()->type()->name() == basic_type::TYPE_STRING)
+    os() << std::string(lvl + 2, ' ') << "printf(\"%s\\n\", ";
+  else {
+    std::cerr << "CANNOT HAPPEN!" << std::endl;
+    exit(1);
+  }
   node->argument()->accept(this, lvl);
   os() << ");\n";
 }
@@ -128,17 +160,19 @@ void simple::c_writer::do_read_node(simple::read_node * const node, int lvl) {
 }
 
 void simple::c_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  CHECK_NODE(node);
   // DAVID: horrible hack!
   std::string id = node->lvalue()->value();
-  if (_symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0))) {
-    os() << std::string(lvl + 2, ' ');
+  std::shared_ptr<simple::symbol> symbol = _symtab.find(id);
+  if (symbol->value() == -1) {
+    symbol->value(0);
+    os() << std::string(lvl, ' ');
     os() << "int " << id << ";\n";
   }
-  os() << std::string(lvl + 2, ' ');
+  os() << std::string(lvl, ' ');
   node->lvalue()->accept(this, lvl);
   os() << " = ";
   node->rvalue()->accept(this, lvl);
-  os() << ";\n";
 }
 
 //---------------------------------------------------------------------------
