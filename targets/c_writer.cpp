@@ -1,4 +1,4 @@
-// $Id: c_writer.cpp,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: c_writer.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/c_writer.h"
 #include "ast/all.h"  /* automatically generated */
@@ -130,7 +130,7 @@ void simple::c_writer::do_read_node(simple::read_node * const node, int lvl) {
 void simple::c_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
   // DAVID: horrible hack!
   std::string id = node->lvalue()->value();
-  if (_symtab.insert(id, std::make_shared<simple::symbol>(0, id, 0))) {
+  if (_symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0))) {
     os() << std::string(lvl + 2, ' ');
     os() << "int " << id << ";\n";
   }

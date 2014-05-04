@@ -1,4 +1,4 @@
-// $Id: postfix_writer.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: postfix_writer.h,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_PF_WRITER_H__
 #define __SIMPLE_SEMANTICS_PF_WRITER_H__
 
@@ -52,7 +52,9 @@ namespace simple {
 
   public:
     void do_integer_node(cdk::integer_node * const node, int lvl);
-    void do_double_node(cdk::double_node * const node, int lvl);
+    void do_double_node(cdk::double_node * const node, int lvl) {
+      // NOTHING TO DO: Simple doesn't have floating point numbers.
+    }
     void do_string_node(cdk::string_node * const node, int lvl);
     void do_identifier_node(cdk::identifier_node * const node, int lvl) {
     }

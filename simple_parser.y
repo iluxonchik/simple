@@ -1,5 +1,5 @@
 %{
-// $Id: simple_parser.y,v 1.1 2014/05/02 22:33:16 david Exp $
+// $Id: simple_parser.y,v 1.2 2014/05/04 22:40:57 david Exp $
 //-- don't change *any* of these: if you do, you'll break the compiler.
 #include <cdk/compiler.h>
 #include "ast/all.h"
@@ -31,7 +31,7 @@
 %left tGE tLE tEQ tNE '>' '<'
 %left '+' '-'
 %left '*' '/' '%'
-%nonassoc tUMINUS
+%nonassoc tUNARY
 
 %type <node> stmt program
 %type <sequence> list
@@ -61,7 +61,7 @@ stmt : expr ';'                         { $$ = new simple::evaluation_node(LINE,
 
 expr : tINTEGER                { $$ = new cdk::integer_node(LINE, $1); }
 	   | tSTRING                 { $$ = new cdk::string_node(LINE, $1); }
-     | '-' expr %prec tUMINUS  { $$ = new cdk::neg_node(LINE, $2); }
+     | '-' expr %prec tUNARY   { $$ = new cdk::neg_node(LINE, $2); }
      | expr '+' expr	         { $$ = new cdk::add_node(LINE, $1, $3); }
      | expr '-' expr	         { $$ = new cdk::sub_node(LINE, $1, $3); }
      | expr '*' expr	         { $$ = new cdk::mul_node(LINE, $1, $3); }

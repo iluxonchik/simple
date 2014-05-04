@@ -1,4 +1,4 @@
-// $Id: type_checker.cpp,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: type_checker.cpp,v 1.2 2014/05/04 22:40:58 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/type_checker.h"
 #include "ast/all.h"  // automatically generated
@@ -101,7 +101,7 @@ void simple::type_checker::do_rvalue_node(simple::rvalue_node * const node, int 
 void simple::type_checker::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
   const std::string &id = node->value();
   std::shared_ptr<simple::symbol> symbol = _symtab.find(id);
-  if (!symbol) throw id + " undeclared";
+  if (symbol == nullptr) throw id + " undeclared";
   // hackish stuff...
   node->type(new basic_type(4, basic_type::TYPE_INT));
 }
@@ -124,6 +124,14 @@ void simple::type_checker::do_read_node(simple::read_node * const node, int lvl)
 
 void simple::type_checker::do_assignment_node(simple::assignment_node * const node, int lvl) {
   ASSERT_UNSPEC;
+
+  // DAVID: horrible hack!
+  // (this is caused by Simple not having explicit variable declarations)
+  const std::string &id = node->lvalue()->value();
+  if (!_symtab.find(id)) {
+    _symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, -1)); // put in the symbol table
+  }
+
   node->lvalue()->accept(this, lvl + 2);
   if (node->lvalue()->type()->name() != basic_type::TYPE_INT)
     throw std::string("wrong type in left argument of assignment expression");

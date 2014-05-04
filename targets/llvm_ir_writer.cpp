@@ -1,4 +1,4 @@
-// $Id: llvm_ir_writer.cpp,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: llvm_ir_writer.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
 #include <string>
 #include <sstream>
 #include "targets/llvm_ir_writer.h"
@@ -235,7 +235,7 @@ void simple::llvm_ir_writer::do_assignment_node(simple::assignment_node * const 
     // put in the known values table
     _named_values[id] = lhs;
     // put in the symbol table
-    _symtab.insert(id, std::make_shared<simple::symbol>(0, id, 0));
+    _symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0));
   }
   else {
     node->lvalue()->accept(this, lvl); // where to store the value

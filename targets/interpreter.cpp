@@ -1,4 +1,4 @@
-// $Id: interpreter.cpp,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: interpreter.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/interpreter.h"
 #include "ast/all.h"  // automatically generated
@@ -135,7 +135,7 @@ void simple::interpreter::do_assignment_node(simple::assignment_node * const nod
   const std::string &id = node->lvalue()->value();
   std::shared_ptr<simple::symbol> symbol = _symtab.find(id);
   if (symbol == nullptr) {
-    symbol = std::make_shared<simple::symbol>(0, id, 0);
+    symbol = std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0);
     _symtab.insert(id, symbol);
     symbol = _symtab.find(id);
   }
