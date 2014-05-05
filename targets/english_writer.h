@@ -1,10 +1,12 @@
-// $Id: english_writer.h,v 1.2 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
+// $Id: english_writer.h,v 1.3 2014/05/05 20:00:37 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_ENGLISH_WRITER_H__
 #define __SIMPLE_SEMANTICS_ENGLISH_WRITER_H__
 
 #include <string>
 #include <iostream>
+#include <cdk/symbol_table.h>
 #include "targets/basic_ast_visitor.h"
+#include "targets/symbol.h"
 
 namespace simple {
 
@@ -12,7 +14,6 @@ namespace simple {
    * Print nodes as English language to the output stream.
    */
   class english_writer: public basic_ast_visitor {
-
     cdk::symbol_table<simple::symbol> &_symtab;
 
   public:

@@ -1,4 +1,4 @@
-// $Id: english_target.h,v 1.1 2014/05/02 22:33:16 david Exp $
+// $Id: english_target.h,v 1.2 2014/05/05 20:00:37 david Exp $
 #ifndef __SIMPLE_SEMANTICS_ENGLISH_EVALUATOR_H__
 #define __SIMPLE_SEMANTICS_ENGLISH_EVALUATOR_H__
 
@@ -19,7 +19,11 @@ namespace simple {
 
   public:
     bool evaluate(std::shared_ptr<cdk::compiler> compiler) {
-      english_writer writer(compiler);
+      // this symbol table will be used to check identifiers
+      // an exception will be thrown if identifiers are used before declaration
+      cdk::symbol_table<simple::symbol> symtab;
+
+      english_writer writer(compiler, symtab);
       compiler->ast()->accept(&writer, 0);
       return true;
     }
