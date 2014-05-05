@@ -1,4 +1,4 @@
-// $Id: type_checker.cpp,v 1.2 2014/05/04 22:40:58 david Exp $ -*- c++ -*-
+// $Id: type_checker.cpp,v 1.3 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/type_checker.h"
 #include "ast/all.h"  // automatically generated
@@ -12,11 +12,6 @@
 void simple::type_checker::do_integer_node(cdk::integer_node * const node, int lvl) {
   ASSERT_UNSPEC;
   node->type(new basic_type(4, basic_type::TYPE_INT));
-}
-
-void simple::type_checker::do_double_node(cdk::double_node * const node, int lvl) {
-  ASSERT_UNSPEC;
-  node->type(new basic_type(8, basic_type::TYPE_DOUBLE));
 }
 
 void simple::type_checker::do_string_node(cdk::string_node * const node, int lvl) {
@@ -108,20 +103,6 @@ void simple::type_checker::do_lvalue_node(simple::lvalue_node * const node, int 
 
 //---------------------------------------------------------------------------
 
-void simple::type_checker::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
-  node->argument()->accept(this, lvl + 2);
-}
-
-void simple::type_checker::do_print_node(simple::print_node * const node, int lvl) {
-  node->argument()->accept(this, lvl + 2);
-}
-
-//---------------------------------------------------------------------------
-
-void simple::type_checker::do_read_node(simple::read_node * const node, int lvl) {
-  node->argument()->accept(this, lvl + 2);
-}
-
 void simple::type_checker::do_assignment_node(simple::assignment_node * const node, int lvl) {
   ASSERT_UNSPEC;
 
@@ -142,6 +123,22 @@ void simple::type_checker::do_assignment_node(simple::assignment_node * const no
 
   // in Simple, expressions are always int
   node->type(new basic_type(4, basic_type::TYPE_INT));
+}
+
+//---------------------------------------------------------------------------
+
+void simple::type_checker::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
+  node->argument()->accept(this, lvl + 2);
+}
+
+void simple::type_checker::do_print_node(simple::print_node * const node, int lvl) {
+  node->argument()->accept(this, lvl + 2);
+}
+
+//---------------------------------------------------------------------------
+
+void simple::type_checker::do_read_node(simple::read_node * const node, int lvl) {
+  node->argument()->accept(this, lvl + 2);
 }
 
 //---------------------------------------------------------------------------

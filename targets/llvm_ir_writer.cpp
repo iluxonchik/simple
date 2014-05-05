@@ -1,6 +1,7 @@
-// $Id: llvm_ir_writer.cpp,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
+// $Id: llvm_ir_writer.cpp,v 1.3 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #include <string>
 #include <sstream>
+#include "targets/type_checker.h"
 #include "targets/llvm_ir_writer.h"
 #include "ast/all.h"  // all.h is automatically generated
 
@@ -9,19 +10,14 @@
 //---------------------------------------------------------------------------
 
 void simple::llvm_ir_writer::do_sequence_node(cdk::sequence_node * const node, int lvl) {
-  for (size_t i = 0; i < node->size(); i++) {
+  for (size_t i = 0; i < node->size(); i++)
     node->node(i)->accept(this, lvl);
-  }
 }
 
 //---------------------------------------------------------------------------
 
 void simple::llvm_ir_writer::do_integer_node(cdk::integer_node * const node, int lvl) {
   _child = llvm::ConstantInt::get(_integerTy, node->value());
-}
-
-void simple::llvm_ir_writer::do_double_node(cdk::double_node * const node, int lvl) {
-  // NOTHING TO DO: Simple doesn't have floating point numbers.
 }
 
 void simple::llvm_ir_writer::do_string_node(cdk::string_node * const node, int lvl) {
@@ -37,7 +33,108 @@ void simple::llvm_ir_writer::do_string_node(cdk::string_node * const node, int l
 
 //---------------------------------------------------------------------------
 
+void simple::llvm_ir_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->argument()->accept(this, lvl); // determine the value
+  llvm::Value *argument = _child;
+  _child = _builder.CreateNeg(argument, "neg");
+}
+
+//---------------------------------------------------------------------------
+
+void simple::llvm_ir_writer::do_add_node(cdk::add_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateAdd(L, R, "add");
+}
+void simple::llvm_ir_writer::do_sub_node(cdk::sub_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateSub(L, R, "sub");
+}
+void simple::llvm_ir_writer::do_mul_node(cdk::mul_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateMul(L, R, "mul");
+}
+void simple::llvm_ir_writer::do_div_node(cdk::div_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateSDiv(L, R, "sdiv");
+}
+void simple::llvm_ir_writer::do_mod_node(cdk::mod_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateSRem(L, R, "srem");
+}
+void simple::llvm_ir_writer::do_lt_node(cdk::lt_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpSLT(L, R, "lt");
+}
+void simple::llvm_ir_writer::do_le_node(cdk::le_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpSLE(L, R, "le");
+}
+void simple::llvm_ir_writer::do_ge_node(cdk::ge_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpSGE(L, R, "ge");
+}
+void simple::llvm_ir_writer::do_gt_node(cdk::gt_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpSGT(L, R, "gt");
+}
+void simple::llvm_ir_writer::do_ne_node(cdk::ne_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpNE(L, R, "ne");
+}
+void simple::llvm_ir_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  node->left()->accept(this, lvl);
+  llvm::Value *L = _child;
+  node->right()->accept(this, lvl);
+  llvm::Value *R = _child;
+  _child = _builder.CreateICmpEQ(L, R, "eq");
+}
+
+//---------------------------------------------------------------------------
+
 void simple::llvm_ir_writer::do_rvalue_node(simple::rvalue_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->lvalue()->accept(this, lvl);
   _child = _builder.CreateLoad(_child);
 }
@@ -45,6 +142,7 @@ void simple::llvm_ir_writer::do_rvalue_node(simple::rvalue_node * const node, in
 //---------------------------------------------------------------------------
 
 void simple::llvm_ir_writer::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   const std::string &id = node->value();
   if (_symtab.find(id)) {
     // Look up the name.
@@ -56,90 +154,30 @@ void simple::llvm_ir_writer::do_lvalue_node(simple::lvalue_node * const node, in
 
 //---------------------------------------------------------------------------
 
-void simple::llvm_ir_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
-  node->argument()->accept(this, lvl); // determine the value
-  llvm::Value *argument = _child;
-  _child = _builder.CreateNeg(argument, "neg");
-}
+void simple::llvm_ir_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  // DAVID: horrible hack!
+  // (this is caused by Simple not having explicit variable declarations)
 
-//---------------------------------------------------------------------------
+  const std::string &id = node->lvalue()->value();
+  llvm::GlobalVariable *lhs = nullptr;
 
-void simple::llvm_ir_writer::do_add_node(cdk::add_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateAdd(L, R, "add");
-}
-void simple::llvm_ir_writer::do_sub_node(cdk::sub_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateSub(L, R, "sub");
-}
-void simple::llvm_ir_writer::do_mul_node(cdk::mul_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateMul(L, R, "mul");
-}
-void simple::llvm_ir_writer::do_div_node(cdk::div_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateSDiv(L, R, "sdiv");
-}
-void simple::llvm_ir_writer::do_mod_node(cdk::mod_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateSRem(L, R, "srem");
-}
-void simple::llvm_ir_writer::do_lt_node(cdk::lt_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpSLT(L, R, "lt");
-}
-void simple::llvm_ir_writer::do_le_node(cdk::le_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpSLE(L, R, "le");
-}
-void simple::llvm_ir_writer::do_ge_node(cdk::ge_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpSGE(L, R, "ge");
-}
-void simple::llvm_ir_writer::do_gt_node(cdk::gt_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpSGT(L, R, "gt");
-}
-void simple::llvm_ir_writer::do_ne_node(cdk::ne_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpNE(L, R, "ne");
-}
-void simple::llvm_ir_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
-  node->left()->accept(this, lvl);
-  llvm::Value *L = _child;
-  node->right()->accept(this, lvl);
-  llvm::Value *R = _child;
-  _child = _builder.CreateICmpEQ(L, R, "eq");
+  if (!_symtab.find(id)) {
+    // get the initial value
+    node->rvalue()->accept(this, lvl);
+    llvm::Constant *init = llvm::cast<llvm::Constant>(_child);
+    lhs = new llvm::GlobalVariable(*_module, _integerTy, false, llvm::GlobalVariable::WeakAnyLinkage, init);
+    // put in the known values table
+    _named_values[id] = lhs;
+    // put in the symbol table
+    _symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0));
+  }
+  else {
+    node->lvalue()->accept(this, lvl); // where to store the value
+    lhs = llvm::cast<llvm::GlobalVariable>(_child);
+  }
+  node->rvalue()->accept(this, lvl); // determine the new value
+  llvm::Value *rhs = _child;
+  _builder.CreateStore(rhs, lhs); // store the value at address
 }
 
 //---------------------------------------------------------------------------
@@ -171,11 +209,12 @@ void simple::llvm_ir_writer::do_program_node(simple::program_node * const node, 
 //---------------------------------------------------------------------------
 
 void simple::llvm_ir_writer::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->argument()->accept(this, lvl); // determine the value
-  llvm::Value *argument = _child;
 }
 
 void simple::llvm_ir_writer::do_print_node(simple::print_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   llvm::Constant *fun_printi = _module->getOrInsertFunction("printi", _voidTy, _integerTy, nullptr);
   llvm::Constant *fun_println = _module->getOrInsertFunction("println", _voidTy, nullptr);
 
@@ -216,34 +255,6 @@ void simple::llvm_ir_writer::do_while_node(simple::while_node * const node, int 
 
   // insert after the end
   _builder.SetInsertPoint(end);
-}
-
-//---------------------------------------------------------------------------
-
-void simple::llvm_ir_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
-  // DAVID: horrible hack!
-  // (this is caused by Simple not having explicit variable declarations)
-
-  const std::string &id = node->lvalue()->value();
-  llvm::GlobalVariable *lhs = nullptr;
-
-  if (!_symtab.find(id)) {
-    // get the initial value
-    node->rvalue()->accept(this, lvl);
-    llvm::Constant *init = llvm::cast<llvm::Constant>(_child);
-    lhs = new llvm::GlobalVariable(*_module, _integerTy, false, llvm::GlobalVariable::WeakAnyLinkage, init);
-    // put in the known values table
-    _named_values[id] = lhs;
-    // put in the symbol table
-    _symtab.insert(id, std::make_shared<simple::symbol>(new basic_type(4, basic_type::TYPE_INT), id, 0));
-  }
-  else {
-    node->lvalue()->accept(this, lvl); // where to store the value
-    lhs = llvm::cast<llvm::GlobalVariable>(_child);
-  }
-  node->rvalue()->accept(this, lvl); // determine the new value
-  llvm::Value *rhs = _child;
-  _builder.CreateStore(rhs, lhs); // store the value at address
 }
 
 //---------------------------------------------------------------------------

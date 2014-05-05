@@ -1,4 +1,4 @@
-// $Id: interpreter.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: interpreter.h,v 1.2 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_INTERPRETER_H__
 #define __SIMPLE_SEMANTICS_INTERPRETER_H__
 
@@ -18,13 +18,13 @@ namespace simple {
 
     // this is a rare anonymous class in C++
     class {
-      std::vector<int> _stack;
+      std::vector<long> _stack;
     public:
-      void push(int i) {
+      void push(long i) {
         _stack.push_back(i);
       }
-      int pop() {
-        int i = _stack.back();
+      long pop() {
+        long i = _stack.back();
         _stack.pop_back();
         return i;
       }
@@ -43,20 +43,11 @@ namespace simple {
     }
 
   public:
-    void do_nil_node(cdk::nil_node * const node, int lvl) {
-    }
-    void do_data_node(cdk::data_node * const node, int lvl) {
-    }
-    void do_composite_node(cdk::composite_node * const node, int lvl) {
-    }
     void do_sequence_node(cdk::sequence_node * const node, int lvl);
 
   public:
     void do_integer_node(cdk::integer_node * const node, int lvl);
-    void do_double_node(cdk::double_node * const node, int lvl);
     void do_string_node(cdk::string_node * const node, int lvl);
-    void do_identifier_node(cdk::identifier_node * const node, int lvl) {
-    }
 
   public:
     void do_neg_node(cdk::neg_node * const node, int lvl);

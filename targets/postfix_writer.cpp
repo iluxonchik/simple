@@ -1,25 +1,9 @@
-// $Id: postfix_writer.cpp,v 1.3 2014/05/04 23:44:15 david Exp $ -*- c++ -*-
+// $Id: postfix_writer.cpp,v 1.4 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #include <string>
 #include <sstream>
 #include "targets/type_checker.h"
 #include "targets/postfix_writer.h"
 #include "ast/all.h"  // all.h is automatically generated
-
-//---------------------------------------------------------------------------
-//     HELPER MACRO FOR TYPE CHECKING
-//---------------------------------------------------------------------------
-
-#define CHECK_NODE(node) \
-{ \
-  try { \
-    simple::type_checker checker(_compiler, _symtab); \
-    (node)->accept(&checker, 0); \
-  } \
-  catch (std::string &problem) { \
-    std::cerr << (node)->lineno() << ": FATAL: " << problem << std::endl; \
-    return; \
-  } \
-}
 
 //---------------------------------------------------------------------------
 //     THIS IS THE VISITOR'S DEFINITION
@@ -54,6 +38,7 @@ void simple::postfix_writer::do_string_node(cdk::string_node * const node, int l
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->argument()->accept(this, lvl); // determine the value
   _pf.NEG(); // 2-complement
 }
@@ -61,67 +46,67 @@ void simple::postfix_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_add_node(cdk::add_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.ADD();
 }
 void simple::postfix_writer::do_sub_node(cdk::sub_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.SUB();
 }
 void simple::postfix_writer::do_mul_node(cdk::mul_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.MUL();
 }
 void simple::postfix_writer::do_div_node(cdk::div_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.DIV();
 }
 void simple::postfix_writer::do_mod_node(cdk::mod_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.MOD();
 }
 void simple::postfix_writer::do_lt_node(cdk::lt_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.LT();
 }
 void simple::postfix_writer::do_le_node(cdk::le_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.LE();
 }
 void simple::postfix_writer::do_ge_node(cdk::ge_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.GE();
 }
 void simple::postfix_writer::do_gt_node(cdk::gt_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.GT();
 }
 void simple::postfix_writer::do_ne_node(cdk::ne_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.NE();
 }
 void simple::postfix_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.EQ();
@@ -130,7 +115,7 @@ void simple::postfix_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_rvalue_node(simple::rvalue_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->lvalue()->accept(this, lvl);
   _pf.LOAD(); //FIXME: depends on type size
 }
@@ -138,9 +123,33 @@ void simple::postfix_writer::do_rvalue_node(simple::rvalue_node * const node, in
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   // simplified generation: all variables are global
   _pf.ADDR(node->value());
+}
+
+//---------------------------------------------------------------------------
+
+void simple::postfix_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+
+  // DAVID: horrible hack!
+  // (this is caused by Simple not having explicit variable declarations)
+  const std::string &id = node->lvalue()->value();
+  std::shared_ptr<simple::symbol> symbol = _symtab.find(id);
+  if (symbol->value() == -1) {
+    _pf.DATA(); // variables are all global and live in DATA
+    _pf.ALIGN(); // make sure we are aligned
+    _pf.LABEL(id); // name variable location
+    _pf.CONST(0); // initialize it to 0 (zero)
+    _pf.TEXT(); // return to the TEXT segment
+    symbol->value(0);
+  }
+
+  node->rvalue()->accept(this, lvl); // determine the new value
+  _pf.DUP();
+  node->lvalue()->accept(this, lvl); // where to store the value
+  _pf.STORE(); // store the value at address
 }
 
 //---------------------------------------------------------------------------
@@ -176,7 +185,7 @@ void simple::postfix_writer::do_program_node(simple::program_node * const node, 
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->argument()->accept(this, lvl); // determine the value
   if (node->argument()->type()->name() == basic_type::TYPE_INT) {
     _pf.TRASH(4); // delete the evaluated value
@@ -191,7 +200,7 @@ void simple::postfix_writer::do_evaluation_node(simple::evaluation_node * const 
 }
 
 void simple::postfix_writer::do_print_node(simple::print_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   node->argument()->accept(this, lvl); // determine the value to print
   if (node->argument()->type()->name() == basic_type::TYPE_INT) {
     _pf.CALL("printi");
@@ -211,7 +220,7 @@ void simple::postfix_writer::do_print_node(simple::print_node * const node, int 
 //---------------------------------------------------------------------------
 
 void simple::postfix_writer::do_read_node(simple::read_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   _pf.CALL("readi");
   _pf.PUSH();
   node->argument()->accept(this, lvl);
@@ -228,30 +237,6 @@ void simple::postfix_writer::do_while_node(simple::while_node * const node, int 
   node->block()->accept(this, lvl + 2);
   _pf.JMP(mklbl(lbl1));
   _pf.LABEL(mklbl(lbl2));
-}
-
-//---------------------------------------------------------------------------
-
-void simple::postfix_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
-  CHECK_NODE(node);
-
-  // DAVID: horrible hack!
-  // (this is caused by Simple not having explicit variable declarations)
-  const std::string &id = node->lvalue()->value();
-  std::shared_ptr<simple::symbol> symbol = _symtab.find(id);
-  if (symbol->value() == -1) {
-    _pf.DATA(); // variables are all global and live in DATA
-    _pf.ALIGN(); // make sure we are aligned
-    _pf.LABEL(id); // name variable location
-    _pf.CONST(0); // initialize it to 0 (zero)
-    _pf.TEXT(); // return to the TEXT segment
-    symbol->value(0);
-  }
-
-  node->rvalue()->accept(this, lvl); // determine the new value
-  _pf.DUP();
-  node->lvalue()->accept(this, lvl); // where to store the value
-  _pf.STORE(); // store the value at address
 }
 
 //---------------------------------------------------------------------------

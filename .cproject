@@ -48,7 +48,11 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="simple.null.1548007976" name="simple"/>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Linux GCC">
+			<resource resourceType="PROJECT" workspacePath="/simple"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
 		<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">

@@ -1,4 +1,4 @@
-// $Id: symbol.h,v 1.2 2014/05/04 22:40:57 david Exp $ -*- c++ -*-
+// $Id: symbol.h,v 1.3 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_SYMBOL_H__
 #define __SIMPLE_SEMANTICS_SYMBOL_H__
 
@@ -10,10 +10,10 @@ namespace simple {
     class symbol {
       const basic_type *_type;
       std::string _name;
-      int _value; // hack!
+      long _value; // hack!
 
     public:
-      inline symbol(const basic_type *type, const std::string &name, int value) :
+      inline symbol(const basic_type *type, const std::string &name, long value) :
           _type(type), _name(name), _value(value) {
       }
 
@@ -27,10 +27,10 @@ namespace simple {
       inline const std::string &name() const {
         return _name;
       }
-      inline int value() const {
+      inline long value() const {
         return _value;
       }
-      inline int value(int v) {
+      inline long value(long v) {
         return _value = v;
       }
     };

@@ -1,24 +1,8 @@
-// $Id: xml_writer.cpp,v 1.2 2014/05/04 23:44:15 david Exp $ -*- c++ -*-
+// $Id: xml_writer.cpp,v 1.3 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #include <string>
 #include "targets/xml_writer.h"
 #include "targets/type_checker.h"
 #include "ast/all.h"  // automatically generated
-
-//---------------------------------------------------------------------------
-//     HELPER MACRO FOR TYPE CHECKING
-//---------------------------------------------------------------------------
-
-#define CHECK_NODE(node) \
-{ \
-  try { \
-    simple::type_checker checker(_compiler, _symtab); \
-    (node)->accept(&checker, 0); \
-  } \
-  catch (std::string &problem) { \
-    std::cerr << (node)->lineno() << ": FATAL: " << problem << std::endl; \
-    return; \
-  } \
-}
 
 //---------------------------------------------------------------------------
 
@@ -35,10 +19,6 @@ void simple::xml_writer::do_integer_node(cdk::integer_node * const node, int lvl
   processSimple(node, lvl);
 }
 
-void simple::xml_writer::do_double_node(cdk::double_node * const node, int lvl) {
-  processSimple(node, lvl);
-}
-
 void simple::xml_writer::do_string_node(cdk::string_node * const node, int lvl) {
   processSimple(node, lvl);
 }
@@ -46,7 +26,7 @@ void simple::xml_writer::do_string_node(cdk::string_node * const node, int lvl) 
 //---------------------------------------------------------------------------
 
 inline void simple::xml_writer::processUnaryExpression(cdk::unary_expression_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   openTag(node, lvl);
   node->argument()->accept(this, lvl + 2);
   closeTag(node, lvl);
@@ -59,7 +39,7 @@ void simple::xml_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 inline void simple::xml_writer::processBinaryExpression(cdk::binary_expression_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   openTag(node, lvl);
   node->left()->accept(this, lvl + 2);
   node->right()->accept(this, lvl + 2);
@@ -103,7 +83,7 @@ void simple::xml_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void simple::xml_writer::do_rvalue_node(simple::rvalue_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   openTag(node, lvl);
   node->lvalue()->accept(this, lvl + 4);
   closeTag(node, lvl);
@@ -112,8 +92,20 @@ void simple::xml_writer::do_rvalue_node(simple::rvalue_node * const node, int lv
 //---------------------------------------------------------------------------
 
 void simple::xml_writer::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   processSimple(node, lvl);
+}
+
+//---------------------------------------------------------------------------
+
+void simple::xml_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  openTag(node, lvl);
+  node->lvalue()->accept(this, lvl + 2);
+  openTag("rvalue", lvl + 2);
+  node->rvalue()->accept(this, lvl + 4);
+  closeTag("rvalue", lvl + 2);
+  closeTag(node, lvl);
 }
 
 //---------------------------------------------------------------------------
@@ -127,14 +119,14 @@ void simple::xml_writer::do_program_node(simple::program_node * const node, int 
 //---------------------------------------------------------------------------
 
 void simple::xml_writer::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   openTag(node, lvl);
   node->argument()->accept(this, lvl + 2);
   closeTag(node, lvl);
 }
 
 void simple::xml_writer::do_print_node(simple::print_node * const node, int lvl) {
-  CHECK_NODE(node);
+  CHECK_TYPES(_compiler, _symtab, node);
   openTag(node, lvl);
   node->argument()->accept(this, lvl + 2);
   closeTag(node, lvl);
@@ -145,16 +137,6 @@ void simple::xml_writer::do_print_node(simple::print_node * const node, int lvl)
 void simple::xml_writer::do_read_node(simple::read_node * const node, int lvl) {
   openTag(node, lvl);
   node->argument()->accept(this, lvl + 2);
-  closeTag(node, lvl);
-}
-
-void simple::xml_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
-  CHECK_NODE(node);
-  openTag(node, lvl);
-  node->lvalue()->accept(this, lvl + 2);
-  openTag("rvalue", lvl + 2);
-  node->rvalue()->accept(this, lvl + 4);
-  closeTag("rvalue", lvl + 2);
   closeTag(node, lvl);
 }
 

@@ -1,39 +1,9 @@
-// $Id: english_writer.cpp,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: english_writer.cpp,v 1.2 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #include <string>
 #include <stack>
+#include "targets/type_checker.h"
 #include "targets/english_writer.h"
 #include "ast/all.h"  // automatically generated
-
-//---------------------------------------------------------------------------
-
-void simple::english_writer::do_data_node(cdk::data_node * const node, int lvl) {
-  std::string listsep = "";
-  if (node->size() > 1)
-    listsep = ", ";
-  os() << "this is some data with " << node->size() << " bytes, containing the following: ";
-  for (size_t i = 0; i < node->size() - 1; i++) {
-    os() << ((unsigned char*)node->bucket())[i] << listsep;
-  }
-  if (node->size() > 1) {
-    os() << " and ";
-    os() << ((unsigned char*)node->bucket())[node->size() - 1];
-  }
-}
-
-void simple::english_writer::do_composite_node(cdk::composite_node * const node, int lvl) {
-  std::string listsep = "";
-  if (node->size() > 1)
-    listsep = ", ";
-  os() << "this is a composition containing " << node->size() << " elements, namely the following: ";
-  for (size_t i = 0; i < node->size() - 1; i++) {
-    node->at(i)->accept(this, lvl + 2);
-    os() << listsep;
-  }
-  if (node->size() > 1) {
-    os() << " and ";
-    node->at(node->size() - 1)->accept(this, lvl + 2);
-  }
-}
 
 //---------------------------------------------------------------------------
 
@@ -51,22 +21,17 @@ void simple::english_writer::do_sequence_node(cdk::sequence_node * const node, i
 //---------------------------------------------------------------------------
 
 void simple::english_writer::do_integer_node(cdk::integer_node * const node, int lvl) {
-  //os() << "integer number with value " << node->value();
   os() << node->value();
 }
 
-void simple::english_writer::do_double_node(cdk::double_node * const node, int lvl) {
-  os() << "double precision floating point number with value " << node->value();
-}
-
 void simple::english_writer::do_string_node(cdk::string_node * const node, int lvl) {
-  //os() << "string with value " << node->value();
   os() << "i have to say: \"" << node->value() << "\". ";
 }
 
 //---------------------------------------------------------------------------
 
 inline void simple::english_writer::processUnaryExpression(cdk::unary_expression_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->argument()->accept(this, lvl + 2);
 }
 
@@ -78,6 +43,7 @@ void simple::english_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
 
 inline void simple::english_writer::processBinaryExpression(cdk::binary_expression_node * const node, int lvl,
                                                              const std::string &op) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->left()->accept(this, lvl + 2);
   os() << " " << op << " ";
   node->right()->accept(this, lvl + 2);
@@ -121,13 +87,26 @@ void simple::english_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void simple::english_writer::do_rvalue_node(simple::rvalue_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   node->lvalue()->accept(this, lvl);
 }
 
 //---------------------------------------------------------------------------
 
 void simple::english_writer::do_lvalue_node(simple::lvalue_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   os() << "\"" << node->value() << "\"";
+}
+
+//---------------------------------------------------------------------------
+
+void simple::english_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
+  os() << "set ";
+  node->lvalue()->accept(this, lvl + 2);
+  os() << " to ";
+  node->rvalue()->accept(this, lvl + 4);
+  os() << ". ";
 }
 
 //---------------------------------------------------------------------------
@@ -141,12 +120,14 @@ void simple::english_writer::do_program_node(simple::program_node * const node, 
 //---------------------------------------------------------------------------
 
 void simple::english_writer::do_evaluation_node(simple::evaluation_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   os() << "do ";
   node->argument()->accept(this, lvl + 2);
   os() << ". ";
 }
 
 void simple::english_writer::do_print_node(simple::print_node * const node, int lvl) {
+  CHECK_TYPES(_compiler, _symtab, node);
   os() << "this is ";
   node->argument()->accept(this, lvl + 2);
   os() << ". ";
@@ -157,14 +138,6 @@ void simple::english_writer::do_print_node(simple::print_node * const node, int 
 void simple::english_writer::do_read_node(simple::read_node * const node, int lvl) {
   os() << "please give me a value to put in ";
   node->argument()->accept(this, lvl + 2);
-  os() << ". ";
-}
-
-void simple::english_writer::do_assignment_node(simple::assignment_node * const node, int lvl) {
-  os() << "set ";
-  node->lvalue()->accept(this, lvl + 2);
-  os() << " to ";
-  node->rvalue()->accept(this, lvl + 4);
   os() << ". ";
 }
 

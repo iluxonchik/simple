@@ -1,4 +1,4 @@
-// $Id: c_writer.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: c_writer.h,v 1.2 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_SEMANTICS_CWRITER_H__
 #define __SIMPLE_SEMANTICS_CWRITER_H__
 
@@ -27,20 +27,11 @@ namespace simple {
     }
 
   public:
-    void do_nil_node(cdk::nil_node * const node, int lvl) {
-    }
-    void do_data_node(cdk::data_node * const node, int lvl) {
-    }
-    void do_composite_node(cdk::composite_node * const node, int lvl) {
-    }
     void do_sequence_node(cdk::sequence_node * const node, int lvl);
 
   public:
     void do_integer_node(cdk::integer_node * const node, int lvl);
-    void do_double_node(cdk::double_node * const node, int lvl);
     void do_string_node(cdk::string_node * const node, int lvl);
-    void do_identifier_node(cdk::identifier_node * const node, int lvl) {
-    }
 
   protected:
     void processUnaryExpression(cdk::unary_expression_node * const node, int lvl, const char *tag);

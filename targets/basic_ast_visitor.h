@@ -1,4 +1,4 @@
-// $Id: basic_ast_visitor.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
+// $Id: basic_ast_visitor.h,v 1.2 2014/05/05 19:35:34 david Exp $ -*- c++ -*-
 #ifndef __SIMPLE_BASIC_AST_VISITOR_H__
 #define __SIMPLE_BASIC_AST_VISITOR_H__
 
@@ -39,16 +39,26 @@ public:
 
 public:
   // CDK nodes (general)
-  virtual void do_nil_node(cdk::nil_node * const node, int lvl) = 0;
-  virtual void do_data_node(cdk::data_node * const node, int lvl) = 0;
-  virtual void do_composite_node(cdk::composite_node * const node, int lvl) = 0;
+  virtual void do_nil_node(cdk::nil_node * const node, int lvl) {
+    // Simple does not use this node
+  }
+  virtual void do_data_node(cdk::data_node * const node, int lvl) {
+    // Simple does not use this node
+  }
+  virtual void do_composite_node(cdk::composite_node * const node, int lvl) {
+    // Simple does not use this node
+  }
   virtual void do_sequence_node(cdk::sequence_node * const node, int lvl) = 0;
 
 public:
   virtual void do_integer_node(cdk::integer_node * const node, int lvl) = 0;
-  virtual void do_double_node(cdk::double_node * const node, int lvl) = 0;
+  virtual void do_double_node(cdk::double_node * const node, int lvl) {
+    // Simple does not use this node
+  }
   virtual void do_string_node(cdk::string_node * const node, int lvl) = 0;
-  virtual void do_identifier_node(cdk::identifier_node * const node, int lvl) = 0;
+  virtual void do_identifier_node(cdk::identifier_node * const node, int lvl) {
+    // Simple does not use this node
+  }
 
 public:
   virtual void do_neg_node(cdk::neg_node * const node, int lvl) = 0;
