@@ -229,7 +229,7 @@ void simple::postfix_writer::do_read_node(simple::read_node * const node, int lv
 
 //---------------------------------------------------------------------------
 
-void simple::postfix_writer::do_while_node(simple::while_node * const node, int lvl) {
+void simple::postfix_writer::do_while_node(cdk::while_node * const node, int lvl) {
   int lbl1, lbl2;
   _pf.LABEL(mklbl(lbl1 = ++_lbl));
   node->condition()->accept(this, lvl);
@@ -241,7 +241,7 @@ void simple::postfix_writer::do_while_node(simple::while_node * const node, int 
 
 //---------------------------------------------------------------------------
 
-void simple::postfix_writer::do_if_node(simple::if_node * const node, int lvl) {
+void simple::postfix_writer::do_if_node(cdk::if_node * const node, int lvl) {
   int lbl1;
   node->condition()->accept(this, lvl);
   _pf.JZ(mklbl(lbl1 = ++_lbl));
@@ -251,7 +251,7 @@ void simple::postfix_writer::do_if_node(simple::if_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::postfix_writer::do_if_else_node(simple::if_else_node * const node, int lvl) {
+void simple::postfix_writer::do_if_else_node(cdk::if_else_node * const node, int lvl) {
   int lbl1, lbl2;
   node->condition()->accept(this, lvl);
   _pf.JZ(mklbl(lbl1 = ++_lbl));

@@ -53,9 +53,9 @@ list : stmt	     { $$ = new cdk::sequence_node(LINE, $1); }
 stmt : expr ';'                         { $$ = new simple::evaluation_node(LINE, $1); }
  	   | tPRINT expr ';'                  { $$ = new simple::print_node(LINE, $2); }
      | tREAD lval ';'                   { $$ = new simple::read_node(LINE, $2); }
-     | tWHILE '(' expr ')' stmt         { $$ = new simple::while_node(LINE, $3, $5); }
-     | tIF '(' expr ')' stmt %prec tIFX { $$ = new simple::if_node(LINE, $3, $5); }
-     | tIF '(' expr ')' stmt tELSE stmt { $$ = new simple::if_else_node(LINE, $3, $5, $7); }
+     | tWHILE '(' expr ')' stmt         { $$ = new cdk::while_node(LINE, $3, $5); }
+     | tIF '(' expr ')' stmt %prec tIFX { $$ = new cdk::if_node(LINE, $3, $5); }
+     | tIF '(' expr ')' stmt tELSE stmt { $$ = new cdk::if_else_node(LINE, $3, $5, $7); }
      | '{' list '}'                     { $$ = $2; }
      ;
 

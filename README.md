@@ -1,2 +1,1 @@
-# simple
-Simple compiler (based on CDK)
+Simple compiler (based on CDK).

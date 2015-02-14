@@ -52,9 +52,10 @@ namespace cdk {
   class unary_expression_node; 
   class neg_node;
   class binary_expression_node;
-  class add_node; class sub_node; class mul_node; class div_node;
-  class mod_node; class lt_node;  class le_node;  class ge_node;  
-  class gt_node;  class eq_node;  class ne_node;
+  class add_node;   class sub_node; class mul_node; class div_node;
+  class mod_node;   class lt_node;  class le_node;  class ge_node;  
+  class gt_node;    class eq_node;  class ne_node;
+  class while_node; class if_node;  class if_else_node;
 } // namespace cdk
 
 //---------------------------------------------------------------------------
@@ -99,6 +100,9 @@ $decls
 #include <cdk/ast/le_node.h>
 #include <cdk/ast/ne_node.h>
 #include <cdk/ast/eq_node.h>
+#include <cdk/ast/while_node.h>
+#include <cdk/ast/if_node.h>
+#include <cdk/ast/if_else_node.h>
 
 //---------------------------------------------------------------------------
 //     THESE ARE THE NODES DEFINED SPECIFICALLY FOR THIS APPLICATION
