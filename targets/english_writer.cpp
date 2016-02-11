@@ -143,7 +143,7 @@ void simple::english_writer::do_read_node(simple::read_node * const node, int lv
 
 //---------------------------------------------------------------------------
 
-void simple::english_writer::do_while_node(cdk::while_node * const node, int lvl) {
+void simple::english_writer::do_while_node(simple::while_node * const node, int lvl) {
   os() << "while ";
   node->condition()->accept(this, lvl + 4);
   os() << " do as follows. ";
@@ -155,7 +155,7 @@ void simple::english_writer::do_while_node(cdk::while_node * const node, int lvl
 
 //---------------------------------------------------------------------------
 
-void simple::english_writer::do_if_node(cdk::if_node * const node, int lvl) {
+void simple::english_writer::do_if_node(simple::if_node * const node, int lvl) {
   os() << "if ";
   node->condition()->accept(this, lvl + 4);
   os() << " then do as follows. ";
@@ -165,7 +165,7 @@ void simple::english_writer::do_if_node(cdk::if_node * const node, int lvl) {
   os() << " end. "; // multiple ways...
 }
 
-void simple::english_writer::do_if_else_node(cdk::if_else_node * const node, int lvl) {
+void simple::english_writer::do_if_else_node(simple::if_else_node * const node, int lvl) {
   os() << "if ";
   node->condition()->accept(this, lvl + 4);
   os() << " then do as follows. ";

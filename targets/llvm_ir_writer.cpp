@@ -236,7 +236,7 @@ void simple::llvm_ir_writer::do_read_node(simple::read_node * const node, int lv
 
 //---------------------------------------------------------------------------
 
-void simple::llvm_ir_writer::do_while_node(cdk::while_node * const node, int lvl) {
+void simple::llvm_ir_writer::do_while_node(simple::while_node * const node, int lvl) {
   llvm::BasicBlock *entry = llvm::BasicBlock::Create(_module->getContext(), "while_entry", _function);
   llvm::BasicBlock *body = llvm::BasicBlock::Create(_module->getContext(), "while_body", _function);
   llvm::BasicBlock *end = llvm::BasicBlock::Create(_module->getContext(), "while_end", _function);
@@ -259,7 +259,7 @@ void simple::llvm_ir_writer::do_while_node(cdk::while_node * const node, int lvl
 
 //---------------------------------------------------------------------------
 
-void simple::llvm_ir_writer::do_if_node(cdk::if_node * const node, int lvl) {
+void simple::llvm_ir_writer::do_if_node(simple::if_node * const node, int lvl) {
   //llvm::BasicBlock *entry = llvm::BasicBlock::Create(_module->getContext(), "if_then_entry", _function);
   llvm::BasicBlock *block_then = llvm::BasicBlock::Create(_module->getContext(), "if_then_true_block", _function);
   llvm::BasicBlock *end = llvm::BasicBlock::Create(_module->getContext(), "if_then_end", _function);
@@ -279,7 +279,7 @@ void simple::llvm_ir_writer::do_if_node(cdk::if_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::llvm_ir_writer::do_if_else_node(cdk::if_else_node * const node, int lvl) {
+void simple::llvm_ir_writer::do_if_else_node(simple::if_else_node * const node, int lvl) {
   //llvm::BasicBlock *entry = llvm::BasicBlock::Create(_module->getContext(), "if_then_else_entry", _function);
   llvm::BasicBlock *block_then = llvm::BasicBlock::Create(_module->getContext(), "if_then_else_true_block", _function);
   llvm::BasicBlock *block_else = llvm::BasicBlock::Create(_module->getContext(), "if_then_else_false_block", _function);

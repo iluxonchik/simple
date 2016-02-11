@@ -143,16 +143,16 @@ void simple::type_checker::do_read_node(simple::read_node * const node, int lvl)
 
 //---------------------------------------------------------------------------
 
-void simple::type_checker::do_while_node(cdk::while_node * const node, int lvl) {
+void simple::type_checker::do_while_node(simple::while_node * const node, int lvl) {
   node->condition()->accept(this, lvl + 4);
 }
 
 //---------------------------------------------------------------------------
 
-void simple::type_checker::do_if_node(cdk::if_node * const node, int lvl) {
+void simple::type_checker::do_if_node(simple::if_node * const node, int lvl) {
   node->condition()->accept(this, lvl + 4);
 }
 
-void simple::type_checker::do_if_else_node(cdk::if_else_node * const node, int lvl) {
+void simple::type_checker::do_if_else_node(simple::if_else_node * const node, int lvl) {
   node->condition()->accept(this, lvl + 4);
 }

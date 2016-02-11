@@ -159,7 +159,7 @@ void simple::c_writer::do_read_node(simple::read_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::c_writer::do_while_node(cdk::while_node * const node, int lvl) {
+void simple::c_writer::do_while_node(simple::while_node * const node, int lvl) {
   os() << std::string(lvl + 2, ' ') << "while(";
   node->condition()->accept(this, lvl);
   os() << ") {\n";
@@ -169,7 +169,7 @@ void simple::c_writer::do_while_node(cdk::while_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::c_writer::do_if_node(cdk::if_node * const node, int lvl) {
+void simple::c_writer::do_if_node(simple::if_node * const node, int lvl) {
   os() << std::string(lvl + 2, ' ') << "if (";
   node->condition()->accept(this, lvl);
   os() << ") {\n";
@@ -177,7 +177,7 @@ void simple::c_writer::do_if_node(cdk::if_node * const node, int lvl) {
   os() << std::string(lvl + 2, ' ') << "}\n";
 }
 
-void simple::c_writer::do_if_else_node(cdk::if_else_node * const node, int lvl) {
+void simple::c_writer::do_if_else_node(simple::if_else_node * const node, int lvl) {
   os() << std::string(lvl + 2, ' ') << "if (";
   node->condition()->accept(this, lvl);
   os() << ") {\n";

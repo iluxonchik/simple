@@ -142,7 +142,7 @@ void simple::xml_writer::do_read_node(simple::read_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::xml_writer::do_while_node(cdk::while_node * const node, int lvl) {
+void simple::xml_writer::do_while_node(simple::while_node * const node, int lvl) {
   openTag(node, lvl);
   openTag("condition", lvl + 2);
   node->condition()->accept(this, lvl + 4);
@@ -155,7 +155,7 @@ void simple::xml_writer::do_while_node(cdk::while_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void simple::xml_writer::do_if_node(cdk::if_node * const node, int lvl) {
+void simple::xml_writer::do_if_node(simple::if_node * const node, int lvl) {
   openTag(node, lvl);
   openTag("condition", lvl + 2);
   node->condition()->accept(this, lvl + 4);
@@ -166,7 +166,7 @@ void simple::xml_writer::do_if_node(cdk::if_node * const node, int lvl) {
   closeTag(node, lvl);
 }
 
-void simple::xml_writer::do_if_else_node(cdk::if_else_node * const node, int lvl) {
+void simple::xml_writer::do_if_else_node(simple::if_else_node * const node, int lvl) {
   openTag(node, lvl);
   openTag("condition", lvl + 2);
   node->condition()->accept(this, lvl + 4);

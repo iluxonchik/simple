@@ -77,11 +77,6 @@ public:
   virtual void do_eq_node(cdk::eq_node * const node, int lvl) = 0;
 
 public:
-  virtual void do_while_node(cdk::while_node * const node, int lvl) = 0;
-  virtual void do_if_node(cdk::if_node * const node, int lvl) = 0;
-  virtual void do_if_else_node(cdk::if_else_node * const node, int lvl) = 0;
-
-public:
   virtual void do_lvalue_node(simple::lvalue_node * const node, int lvl) = 0;
   virtual void do_rvalue_node(simple::rvalue_node * const node, int lvl) = 0;
 
@@ -91,6 +86,11 @@ public:
   virtual void do_print_node(simple::print_node * const node, int lvl) = 0;
   virtual void do_read_node(simple::read_node * const node, int lvl) = 0;
   virtual void do_assignment_node(simple::assignment_node * const node, int lvl) = 0;
+
+public:
+  virtual void do_while_node(simple::while_node * const node, int lvl) = 0;
+  virtual void do_if_node(simple::if_node * const node, int lvl) = 0;
+  virtual void do_if_else_node(simple::if_else_node * const node, int lvl) = 0;
 
 };
 
