@@ -1,6 +1,6 @@
 // $Id: while_node.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
-#ifndef __CDK_WHILENODE_H__
-#define __CDK_WHILENODE_H__
+#ifndef __SIMPLE_WHILENODE_H__
+#define __SIMPLE_WHILENODE_H__
 
 #include <cdk/ast/expression_node.h>
 

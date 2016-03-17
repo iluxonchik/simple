@@ -1,6 +1,6 @@
 // $Id: if_else_node.h,v 1.1 2014/05/02 22:33:16 david Exp $ -*- c++ -*-
-#ifndef __CDK_IFELSENODE_H__
-#define __CDK_IFELSENODE_H__
+#ifndef __SIMPLE_IFELSENODE_H__
+#define __SIMPLE_IFELSENODE_H__
 
 #include <cdk/ast/expression_node.h>
 
